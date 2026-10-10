@@ -1,20 +1,21 @@
 import express from 'express'
 import errorHandler from './middleware/erros.js';
+import cookieParser from 'cookie-parser';
 
 // IMPORTANDO AS ROTAS
-import signup from './routes/signup.js';
-import login from './routes/login.js';
+import auth from './routes/auth.js';
+import tasks from './routes/tasks.js';
 
 const app = express();
 const PORT = 3000;
 
 // MIDDLEWARE
 app.use(express.json());
+app.use(cookieParser());
 
 // ROTAS
-app.use('/signup', signup);
-app.use('/login', login);
-
+app.use('/auth', auth);
+app.use('/tarefas', tasks);
 
 app.use(errorHandler);
 
