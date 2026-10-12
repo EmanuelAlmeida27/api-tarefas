@@ -8,14 +8,14 @@ import criarErro from "../utils/criarErro.js";
 // CADASTRAR (SIGNUP)
 export const cadastrarUsuario = async (req, res, next) => {
   const cadastroSchema = z.object({
-    nome: z.string().min(1, { message: "Nome Obrigatório" }),
+    nome: z.string().min(1, { message: "Nome obrigatório" }),
     email: z
       .string()
-      .email({ message: "Digite Um Email Válido" })
+      .email({ message: "Digite um email válido" })
       .toLowerCase(),
     senha: z
       .string()
-      .min(8, { message: "A Senha Deve Ter No Mínimo 8 Caracteres" }),
+      .min(8, { message: "A senha deve ter no mínimo 8 caracteres" }),
   });
 
   // VALIDANDO O INPUT
@@ -28,11 +28,7 @@ export const cadastrarUsuario = async (req, res, next) => {
   // })
 
   if (!result.success) {
-    const primeiraMensagem =
-      result.error.issues[0].message || "Dados inválidos";
-    const erro = new Error(primeiraMensagem);
-    erro.status = 400;
-    return next(erro);
+    return next(criarErro(result.error.issues[0].message || 'Dados inválidos', 400));
   }
 
   const dados = result.data;
@@ -45,9 +41,7 @@ export const cadastrarUsuario = async (req, res, next) => {
   if (userDB.rows.length) {
     // se não houver um usuário com determinado email no banco,
     // o array rows de userDB é vazio, logo length = 0
-    const erro = new Error("Um Usuário Com Esse Email Já Existe");
-    erro.status = 400;
-    return next(erro);
+    return next(criarErro('Um usuário com esse email já existe', 400));
   }
 
   // ENCRIPTANDO A SENHA
@@ -55,16 +49,21 @@ export const cadastrarUsuario = async (req, res, next) => {
 
   // SALVANDO NO BANCO DE DADOS
   try {
-    await db.query(
+    const resultado = await db.query(
       "INSERT INTO usuarios (nome, email, senha) VALUES ($1, $2, $3) RETURNING *",
       [dados.nome, dados.email, senhaEncriptada],
     );
+
+    const user = {
+      nome: resultado.rows[0].nome,
+      email: resultado.rows[0].email
+    };
+
+    res.status(201).json({ message: 'Usuário criado com sucesso', usuario:  user});    
   } catch (error) {
-    const erro = new Error("Erro Ao Criar Usuário");
-    return next(erro);
+    return next(criarErro('Erro ao criar usuário', 500));
   }
 
-  res.status(201).json({ message: "Usuário Criado Com Sucesso" });
 };
 
 // LOGIN
@@ -73,11 +72,11 @@ export const logarUsuario = async (req, res, next) => {
   const loginSchema = z.object({
     email: z
       .string()
-      .email({ message: "Digite Um Email Válido" })
+      .email({ message: 'Digite um email válido' })
       .toLowerCase(),
     senha: z
       .string()
-      .min(8, { message: "A Senha Deve Ter No Mínimo 8 Caracteres" }),
+      .min(8, { message: 'A senha deve ter no mínimo 8 caracteres' }),
   });
 
   const result = loginSchema.safeParse(req.body);
@@ -87,7 +86,7 @@ export const logarUsuario = async (req, res, next) => {
     // erro.status = 400;
     // return next(erro);
     return next(
-      criarErro(result.error.issues[0].message || "Dados Inválidos", 400),
+      criarErro(result.error.issues[0].message || 'Dados inválidos', 400),
     );
   }
 
@@ -96,25 +95,25 @@ export const logarUsuario = async (req, res, next) => {
   // VERIFICANDO SE EMAIL EXISTE NO BANCO
   let userDB;
   try {
+
     userDB = await db.query(
       "SELECT id, email, senha FROM usuarios WHERE email = $1",
       [dados.email],
     );
+    if (userDB.rows.length === 0) {
+      return next(criarErro('Credenciais inválidas', 400));
+    }
+
   } catch (error) {
-    // const erro = new Error();
-    // return next(erro);
     return next(criarErro());
   }
 
-  if (!userDB.rows.length) {
-    return next(criarErro("Credenciais Inválidas", 400));
-  }
 
   // VERIFICANDO SENHA
   const isMatch = await bcrypt.compare(dados.senha, userDB.rows[0].senha);
 
   if (!isMatch) {
-    return next(criarErro("Credenciais Inválidas", 400));
+    return next(criarErro('Credenciais inválidas', 400));
   }
 
   // CRIANDO TOKEN
@@ -132,5 +131,5 @@ export const logarUsuario = async (req, res, next) => {
     maxAge: 60 * 60 * 1000,
   });
 
-  res.status(200).json({ message: "Login Bem Sucedido" });
+  res.status(200).json({ message: 'Login bem sucedido'});
 };
