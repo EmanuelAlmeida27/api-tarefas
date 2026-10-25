@@ -14,7 +14,7 @@ export const listarTodasTarefas = async (req, res, next) => {
 
     res.json(resultado.rows);
   } catch (error) {
-    return next(criarErro("Erro ao listar tarefas", 500));
+    return next(error);
   }
 };
 

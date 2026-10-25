@@ -2,6 +2,9 @@ import express from 'express'
 import errorHandler from './middleware/erros.js';
 import cookieParser from 'cookie-parser';
 
+import swaggerUi from "swagger-ui-express";
+import swaggerSpec from "./swagger.js";
+
 // IMPORTANDO AS ROTAS
 import auth from './routes/auth.js';
 import tasks from './routes/tasks.js';
@@ -10,6 +13,7 @@ const app = express();
 const PORT = 3000;
 
 // MIDDLEWARE
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use(express.json());
 app.use(cookieParser());
 
