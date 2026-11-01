@@ -21,7 +21,7 @@ app.use(cookieParser());
 // CORS
 app.use(
   cors({
-    origin: "https://api-tarefas.vercel.app", // URL exata do seu frontend no Vercel
+    origin: ["https://api-tarefas.vercel.app", "http://localhost:5173"],
     credentials: true, // obrigatório para enviar cookies
   }),
 );

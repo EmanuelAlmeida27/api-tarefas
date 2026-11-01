@@ -4,14 +4,14 @@ import { defineConfig } from 'vite'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [
-    react(),
-    tailwindcss(),
-  ],
+  plugins: [react(), tailwindcss()],
   server: {
     proxy: {
-      '/auth': 'http://localhost:3000',
-      '/tarefas': 'http://localhost:3000',
-    }
-  }
-})
+      "/api": {
+        target: "http://localhost:3000",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ""), // remove o /api antes de mandar pro backend local
+      },
+    },
+  },
+});
