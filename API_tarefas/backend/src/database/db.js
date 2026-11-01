@@ -10,7 +10,8 @@ pg.types.setTypeParser(1082, (valor) => valor); // Esta linha faz com que o node
                                                 // ser exibida conforme o banco, no caso o DATE: "2026-10-13"
 dotenv.config();
 const db = new Pool({
-  connectionString: process.env.DATABASE_URL
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false },
 });
 
 // TESTANDO CONEXÃO
