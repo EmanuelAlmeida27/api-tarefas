@@ -126,10 +126,20 @@ export const logarUsuario = async (req, res, next) => {
   // ARMAZENADO COOKIE
   res.cookie("token", token, {
     httpOnly: true,
-    secure: false,
-    sameSite: "strict",
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
     maxAge: 60 * 60 * 1000,
   });
 
   res.status(200).json({ message: 'Login bem sucedido'});
+};
+
+// LOGOUT
+export const logoutUsuario = (req, res) => {
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+  });
+  res.json({ message: "Logout realizado" });
 };

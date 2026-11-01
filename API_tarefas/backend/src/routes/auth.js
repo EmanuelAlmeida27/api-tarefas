@@ -1,5 +1,5 @@
 import Router from "express";
-import { cadastrarUsuario, logarUsuario } from '../controllers/authController.js';
+import { cadastrarUsuario, logarUsuario, logoutUsuario } from '../controllers/authController.js';
 
 const router = Router();
 
@@ -110,5 +110,7 @@ router.post('/signup', cadastrarUsuario);
  *               erro: Erro Interno do Servidor
  */
 router.post("/login", logarUsuario);
+
+router.post("/logout", logoutUsuario)
 
 export default router;

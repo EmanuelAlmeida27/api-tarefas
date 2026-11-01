@@ -1,6 +1,7 @@
 import express from 'express'
 import errorHandler from './middleware/erros.js';
 import cookieParser from 'cookie-parser';
+import cors from 'cors';
 
 import swaggerUi from "swagger-ui-express";
 import swaggerSpec from "./swagger.js";
@@ -16,6 +17,14 @@ const PORT = 3000;
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use(express.json());
 app.use(cookieParser());
+
+// CORS
+app.use(
+  cors({
+    origin: "https://api-tarefas.vercel.app/", // URL exata do seu frontend no Vercel
+    credentials: true, // obrigatório para enviar cookies
+  }),
+);
 
 // ROTAS
 app.use('/auth', auth);

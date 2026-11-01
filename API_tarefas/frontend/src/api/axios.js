@@ -1,8 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: '/',
-  withCredentials: true, // envia cookies automaticamente (token JWT)
+  baseURL: import.meta.env.VITE_API_URL || "/",
+  withCredentials: true,
 });
-
 export default api;
