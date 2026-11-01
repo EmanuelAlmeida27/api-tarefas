@@ -1,85 +1,109 @@
-# API de Tarefas
+# API & Gerenciador de Tarefas
 
-API REST para gerenciamento de tarefas com autenticação via JWT (cookie HTTP-only), construída com Node.js, Express e PostgreSQL.
+Aplicação completa (Full Stack) para gerenciamento de tarefas com autenticação via JWT (cookie HTTP-only). O backend foi construído com Node.js, Express e PostgreSQL, acompanhado por um frontend desenvolvido com assistência de IA em React.
+
+🔗 **Acesse a aplicação em produção:** [https://api-tarefas.vercel.app](https://api-tarefas.vercel.app)
+
+---
 
 ## → Tecnologias
 
-- Node.js (ES Modules)
-- Express 5
-- PostgreSQL (via `pg`)
-- JWT (jsonwebtoken) — autenticação por cookie HTTP-only
-- bcrypt — hash de senhas
-- Zod — validação de dados
-- Swagger UI — documentação interativa
-- dotenv — variáveis de ambiente
+### Backend
+- **Node.js** (ES Modules) & **Express 5**
+- **PostgreSQL** (Neon Database via `pg`)
+- **JWT (jsonwebtoken)** — autenticação com cookie HTTP-only
+- **bcrypt** — hash seguro de senhas
+- **Zod** — validação de esquemas e dados de entrada
+- **Swagger UI** — documentação interativa da API
+- **cors** & **cookie-parser**
 
-## → Configuração
+### Frontend *(desenvolvido com assistência de IA)*
+- **React 19** com **Vite**
+- **React Router Dom (v7)** — gerenciamento de rotas e rotas protegidas
+- **TailwindCSS** — interface moderna e responsiva
+- **Axios** — cliente HTTP integrado com proxy reverso
 
-**1. Clone o repositório**
+---
+
+## → Estrutura do Projeto
+
+```
+API_tarefas/
+├── backend/          # API REST Express + PostgreSQL
+│   ├── src/          # Rotas, controllers, middlewares e banco
+│   └── sql/          # Scripts DDL (schema) e seed
+└── frontend/         # Aplicação React SPA
+    ├── src/          # Componentes, páginas e contexto de autenticação
+    └── vercel.json   # Configuração de proxy e rotas SPA na Vercel
+```
+
+---
+
+## → Como Rodar Localmente
+
+### 1. Clone o repositório
 
 ```bash
 git clone https://github.com/EmanuelAlmeida27/api-tarefas.git
 cd api-tarefas
 ```
 
-**2. Instale as dependências**
+### 2. Configurar e rodar o Backend
 
 ```bash
+cd API_tarefas/backend
 npm install
-```
-
-**3. Configure as variáveis de ambiente**
-
-```bash
 cp .env.example .env
 ```
 
-| Variável | Descrição |
-|---|---|
-| `DATABASE_URL` | URL de conexão do PostgreSQL |
-| `JWT_SECRET` | Chave secreta para assinar os tokens JWT |
+Preencha as variáveis no arquivo `.env`:
+- `DATABASE_URL`: URL de conexão do PostgreSQL
+- `JWT_SECRET`: Chave secreta para assinatura dos tokens
 
-**4. Configure o banco de dados**
-
-```bash
-psql $DATABASE_URL -f sql/schema.sql
-```
-
-## → Executando
-
+Inicie o servidor:
 ```bash
 npm start
 ```
+O backend iniciará em `http://localhost:3000`.  
+Documentação Swagger disponível em `http://localhost:3000/api-docs`.
 
-O servidor inicia em `http://localhost:3000` com hot-reload via `--watch`.
+### 3. Configurar e rodar o Frontend
 
-A documentação interativa (Swagger) fica disponível em `http://localhost:3000/api-docs`.
+Em outro terminal:
 
-## → Endpoints
+```bash
+cd API_tarefas/frontend
+npm install
+npm run dev
+```
+O frontend iniciará em `http://localhost:5173`, com proxy configurado automaticamente para o backend local.
+
+---
+
+## → Endpoints da API
 
 ### Autenticação (`/auth`)
 
 | Método | Rota | Descrição |
 |---|---|---|
 | `POST` | `/auth/signup` | Cadastra um novo usuário |
-| `POST` | `/auth/login` | Autentica e define cookie JWT |
+| `POST` | `/auth/login` | Autentica e emite cookie JWT |
+| `POST` | `/auth/logout` | Invalida e limpa o cookie de sessão |
 
-### Tarefas (`/tarefas`) — requer autenticação
+### Tarefas (`/tarefas`) — *requer autenticação*
 
 | Método | Rota | Descrição |
 |---|---|---|
-| `GET` | `/tarefas` | Lista todas as tarefas do usuário |
-| `GET` | `/tarefas/:id` | Busca uma tarefa pelo ID |
+| `GET` | `/tarefas` | Lista todas as tarefas do usuário autenticado |
+| `GET` | `/tarefas/:id` | Busca detalhes de uma tarefa específica |
 | `POST` | `/tarefas` | Cria uma nova tarefa |
-| `PUT` | `/tarefas/:id` | Substitui todos os dados de uma tarefa |
-| `PATCH` | `/tarefas/:id` | Atualiza parcialmente uma tarefa |
+| `PUT` | `/tarefas/:id` | Atualiza todos os campos da tarefa |
+| `PATCH` | `/tarefas/:id` | Atualiza parcialmente uma tarefa (ex: status) |
 | `DELETE` | `/tarefas/:id` | Exclui uma tarefa |
 
-## → Autenticação
+---
 
-Após o login, o servidor define automaticamente um cookie HTTP-only chamado `token` com validade de 1 hora. Todas as rotas de tarefas verificam esse cookie.
-
-## → Schema do banco de dados
+## → Schema do Banco de Dados
 
 ```sql
 CREATE TABLE usuarios (
